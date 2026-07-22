@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAS Installation Progress Tracker</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  background: #f0f2f5;
+  color: #333;
+}
+
+.site-header {
+  background: #1a2744;
+  color: white;
+  padding: 16px 28px 14px;
+}
+
+.site-header h1 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .4px;
+}
+
+.project-fields {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.pfield {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #aab;
+}
+
+.pfield input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #4a6;
+  color: white;
+  font-size: 12px;
+  width: 220px;
+  outline: none;
+  padding: 2px 4px;
+}
+
+.pfield input::placeholder {
+  color: #667;
+}
+
+.nav-bar {
+  background: #243055;
+  display: flex;
+  gap: 2px;
+  padding: 0 28px;
+  overflow-x: auto;
+}
+
+.nav-btn {
+  background: transparent;
+  border: none;
+  color: #aab;
+  padding: 11px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: all .15s;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+  color: white;
+  border-bottom-color: #4a9eff;
+}
+
+.main {
+  padding: 20px 28px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.overall-box {
+  background: #1a2744;
+  color: white;
+  border-radius: 8px;
+  padding: 18px 22px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.overall-pct {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 90px;
+}
+
+.overall-sub {
+  font-size: 12px;
+  color: #aab;
+  margin-top: 4px;
+}
+
+.overall-bar-wrap {
+  flex: 1;
+  background: rgba(255, 255, 255, .15);
+  border-radius: 6px;
+  height: 16px;
+  overflow: hidden;
+}
+
+.overall-bar {
+  height: 100%;
+  border-radius: 6px;
+  background: #27ae60;
+  transition: width .5s;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+  cursor: pointer;
+  transition: box-shadow .15s;
+  border-top: 3px solid #4a9eff;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .12);
+}
+
+.card-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: #888;
+  margin-bottom: 6px;
+}
+
+.card-pct {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a2744;
+  line-height: 1;
+}
+
+.card-sub {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.card-bar-wrap {
+  background: #e8eaf0;
+  border-radius: 4px;
+  height: 6px;
+}
+
+.card-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: #4a9eff;
+  transition: width .4s;
+}
+
+.section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.sec-header {
+  background: #f7f9fc;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e8eaf0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.sec-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a2744;
+  flex: 1;
+  min-width: 200px;
+}
+
+.unit-count {
+  font-size: 11px;
+  font-weight: normal;
+  color: #999;
+}
+
+.sec-bar-wrap {
+  background: #e8eaf0;
+  border-radius: 4px;
+  height: 10px;
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.sec-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: #27ae60;
+  transition: width .4s;
+}
+
+.pct-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a2744;
+  min-width: 42px;
+}
+
+.add-btn {
+  background: #1a2744;
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.add-btn:hover {
+  background: #243055;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+
+thead tr {
+  background: #1a2744;
+  color: white;
+}
+
+th {
+  padding: 8px 5px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 10px;
+  white-space: nowrap;
+  border-right: 1px solid #2d3a5e;
+}
+
+th.col-head {
+  min-width: 56px;
+  -webkit-writing-mode: horizontal-tb;
+  -webkit-text-orientation: mixed;
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
+  transform: rotate(0deg);
+  padding: 14px 60px 10px;
+  letter-spacing: .3px;
+  line-height: 1.3;
+}
+
+th.sub-head {
+  padding: 6px 10px !important;
+  min-width: 28px;
+  border-top: 1px solid #2d3a5e;
+}
+
+tbody tr {
+  border-bottom: 1px solid #f0f2f5;
+}
+
+tbody tr:hover {
+  background: #f7f9fc;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafbfd;
+}
+
+td {
+  padding: 6px 4px;
+  text-align: center;
+  border-right: 1px solid #f0f2f5;
+  vertical-align: middle;
+}
+
+td:nth-child(2) {
+  text-align: left;
+  font-weight: 600;
+}
+
+.srno {
+  color: #aaa;
+  font-size: 11px;
+}
+
+.unit-input {
+  min-width: 110px;
+  outline: none;
+  cursor: text;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.unit-input:focus {
+  background: #fffde7;
+  outline: 1px solid #f39c12;
+}
+
+.unit-input:empty:before {
+  content: attr(placeholder);
+  color: #ccc;
+  font-weight: normal;
+}
+
+.remark-cell {
+  text-align: left !important;
+  font-size: 11px;
+  color: #888;
+  font-style: italic;
+  min-width: 130px;
+  outline: none;
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+
+.remark-cell:focus {
+  background: #f0f7ff;
+  outline: 1px solid #4a9eff;
+}
+
+.remark-cell:empty:before {
+  content: attr(placeholder);
+  color: #ddd;
+}
+
+.pct-cell {
+  font-weight: 700;
+  font-size: 11px;
+  color: #1a2744;
+  white-space: nowrap;
+}
+
+.ck {
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background .1s;
+  min-width: 28px;
+}
+
+.ck:hover {
+  background: #e8f5e9;
+}
+
+.ck[data-val="done"] {
+  background: #c6efce;
+  color: #276221;
+}
+
+.ck[data-val="issue"] {
+  background: #ffc7ce;
+  color: #9c0006;
+}
+
+.legend {
+  display: flex;
+  gap: 20px;
+  padding: 10px 20px;
+  background: #fafbfd;
+  border-top: 1px solid #f0f2f5;
+  font-size: 11px;
+  color: #666;
+  flex-wrap: wrap;
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.leg-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+@media print {
+
+  .nav-bar,
+  .add-btn {
+    display: none !important;
+  }
+
+  .section {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+
+  body {
+    background: white;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+<h1>&#127959; BAS Controls — Installation Progress Tracker</h1>
+<div class="project-fields">
+<div class="pfield">&#128203; Project: <input id="proj-name" placeholder="Project Name / Number" value="[PROJECT NAME TBD]"></div>
+<div class="pfield">&#128205; Address: <input id="proj-addr" placeholder="Project Address" style="width:300px" value="[PROJECT ADDRESS TBD]"></div>
+<div class="pfield">Rev: <input id="proj-rev" placeholder="—" style="width:50px"></div>
+<div class="pfield">Date: <input id="proj-date" placeholder="MM/DD/YYYY" style="width:110px"></div>
+</div></div>
+<div class="nav-bar">
+<button class="nav-btn active" onclick="showSection('SUMMARY')">&#128202; Summary</button>
+<button class="nav-btn" id="nav-CRAC" onclick="showSection('CRAC')">CRAC</button><button class="nav-btn" id="nav-VAV" onclick="showSection('VAV')">VAV</button><button class="nav-btn" id="nav-EAV" onclick="showSection('EAV')">EAV</button><button class="nav-btn" id="nav-FSD" onclick="showSection('FSD')">FSD</button><button class="nav-btn" id="nav-EMETER" onclick="showSection('EMETER')">E-Meter</button><button class="nav-btn" id="nav-AHU" onclick="showSection('AHU')">AHU</button><button class="nav-btn" id="nav-AC" onclick="showSection('AC')">AC Units</button>
+<button class="nav-btn" onclick="window.print()" style="margin-left:auto">&#128424; Print</button>
+</div>
+<div class="main">
+<div id="sec-SUMMARY" class="section" style="display:block">
+<div class="sec-header" style="background:#1a2744">
+<div style="color:white;font-size:15px;font-weight:700">Overall Installation Progress</div>
+</div>
+<div style="padding:20px">
+<div class="overall-box">
+<div style="min-width:100px"><div style="font-size:11px;color:#aab;margin-bottom:2px;text-transform:uppercase;letter-spacing:.6px">Overall</div>
+<div class="overall-pct" id="overall-pct">0%</div>
+<div class="overall-sub" id="overall-sub">0 of 0 checkpoints</div></div>
+<div class="overall-bar-wrap"><div class="overall-bar" id="overall-bar" style="width:0%"></div></div>
+</div>
+<div class="summary-row"><div class="card" id="card-CRAC" onclick="showSection('CRAC')"><div class="card-label">CRAC</div><div class="card-pct" id="cpct-CRAC">0%</div><div class="card-sub" id="csub-CRAC">0 / 0 checks</div><div class="card-bar-wrap"><div class="card-bar" id="cbar-CRAC" style="width:0%"></div></div></div>
+<div class="card" id="card-VAV" onclick="showSection('VAV')"><div class="card-label">VAV</div><div class="card-pct" id="cpct-VAV">0%</div><div class="card-sub" id="csub-VAV">0 / 0 checks</div><div class="card-bar-wrap"><div class="card-bar" id="cbar-VAV" style="width:0%"></div></div></div>
+<div class="card" id="card-EAV" onclick="showSection('EAV')"><div class="card-label">EAV</div><div class="card-pct" id="cpct-EAV">0%</div><div class="card-sub" id="csub-EAV">0 / 0 checks</div><div class="card-bar-wrap"><div class="card-bar" id="cbar-EAV" style="width:0%"></div></div></div>
+<div class="card" id="card-FSD" onclick="showSection('FSD')"><div class="card-label">FSD</div><div class="card-pct" id="cpct-FSD">0%</div><div class="card-sub" id="csub-FSD">0 / 0 checks</div><div class="card-bar-wrap"><div class="card-bar" id="cbar-FSD" style="width:0%"></div></div></div>
+<div class="card" id="card-EMETER" onclick="showSection('EMETER')"><div class="card-label">E-Meter</div><div class="card-pct" id="cpct-EMETER">0%</div><div class="card-sub" id="csub-EMETER">0 / 0 checks</div><div class="card-bar-wrap"><div class="card-bar" id="cbar-EMETER" style="width:0%"></div></div></div>
+<div class="card" id="card-AHU" onclick="showSection('AHU')"><div class="card-label">AHU</div><div class="card-pct" id="cpct-AHU">0%</div><div class="card-sub" id="csub-AHU">0 / 0 checks</div><div class="card-bar-wrap"><div class="card-bar" id="cbar-AHU" style="width:0%"></div></div></div>
+<div class="card" id="card-AC" onclick="showSection('AC')"><div class="card-label">AC Units</div><div class="card-pct" id="cpct-AC">0%</div><div class="card-sub" id="csub-AC">0 / 0 checks</div><div class="card-bar-wrap"><div class="card-bar" id="cbar-AC" style="width:0%"></div></div></div></div>
+<div class="legend">
+<span style="font-weight:700;color:#555">Legend:</span>
+<div class="leg-item"><div class="leg-dot" style="background:#c6efce;color:#276221">&#10003;</div> Complete</div>
+<div class="leg-item"><div class="leg-dot" style="background:#ffc7ce;color:#9c0006">&#10007;</div> Issue / Not Installed</div>
+<div class="leg-item"><div class="leg-dot" style="background:#f0f2f5;border:1px solid #ddd">&nbsp;</div> Pending (blank)</div>
+<div class="leg-item" style="margin-left:auto;color:#aaa">Click cell to cycle: blank &#8594; &#10003; &#8594; &#10007; &#8594; blank &nbsp;|&nbsp; Unit/Tag cells and Remarks are directly editable</div>
+</div></div></div>
+
+<div id="sec-CRAC" class="section" style="display:none"><div class="sec-header"><div class="sec-title">CRAC — Computer Room Air Conditioning &nbsp;<span id="count-CRAC" class="unit-count">0 units</span></div><div class="sec-bar-wrap"><div class="sec-bar" id="bar-CRAC" style="width:0%"></div></div><span id="pct-label-CRAC" class="pct-label">0%</span><button class="add-btn" onclick="addRow('CRAC')">+ Add Unit</button></div><div class="table-wrap"><table id="tbl-CRAC"><thead><tr><th rowspan="2" style="width:38px">SR.</th><th rowspan="2" style="min-width:130px">UNIT / TAG</th><th rowspan="2" class="col-head">Unit Installed</th><th rowspan="2" class="col-head">Power Rough In</th><th rowspan="2" class="col-head">Power Term</th><th rowspan="2" class="col-head">Comm Wire Term</th><th rowspan="2" class="col-head">Panel/Ctrl Term</th><th rowspan="2" class="col-head">CHWV Installed</th><th rowspan="2" class="col-head">CHWV Rough In</th><th rowspan="2" class="col-head">CHWV Term</th><th rowspan="2" class="col-head">Leak Det Install</th><th rowspan="2" class="col-head">Leak Det Term</th><th rowspan="2" class="col-head">Panel Install</th><th rowspan="2" class="col-head">Panel Rough In</th><th rowspan="2" class="col-head">Panel Term</th><th rowspan="2" class="col-head">Condensate Pump</th><th rowspan="2" class="col-head">Tstat Rough In</th><th class="col-head" colspan="3  ">Tstat Install / Term</th><th rowspan="2" style="min-width:160px">REMARK / NOTES</th><th rowspan="2" style="width:60px">% DONE</th></tr><tr><th class="col-head sub-head">Install</th><th class="col-head sub-head">Term</th></tr></thead><tbody id="tbody-CRAC"><tr><td class="srno">1</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">2</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">3</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">4</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">5</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">6</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">7</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">8</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">9</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">10</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="ck" onclick="toggleCell(this)" data-section="CRAC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr></tbody></table></div></div>
+
+
+<div id="sec-VAV" class="section" style="display:none"><div class="sec-header"><div class="sec-title">VAV — Variable Air Volume &nbsp;<span id="count-VAV" class="unit-count">0 units</span></div><div class="sec-bar-wrap"><div class="sec-bar" id="bar-VAV" style="width:0%"></div></div><span id="pct-label-VAV" class="pct-label">0%</span><button class="add-btn" onclick="addRow('VAV')">+ Add Unit</button></div><div class="table-wrap"><table id="tbl-VAV"><thead><tr><th rowspan="2" style="width:38px">SR.</th><th rowspan="2" style="min-width:130px">UNIT / TAG</th><th rowspan="2" class="col-head">Unit Installed</th><th rowspan="2" class="col-head">120V Power</th><th rowspan="2" class="col-head">MAC / Barcode</th><th rowspan="2" class="col-head">Comm Wire (CAT-6)</th><th rowspan="2" class="col-head">Panel/Ctrl Term</th><th rowspan="2" class="col-head">RPI Rough In</th><th rowspan="2" class="col-head">RPI Install/Term</th><th rowspan="2" class="col-head">RPI Pneumatic</th><th rowspan="2" class="col-head">Tstat Rough In</th><th class="col-head" colspan="3">Tstat Install / Term</th><th rowspan="2" class="col-head">HWV Install</th><th rowspan="2" class="col-head">HWV Rough In</th><th rowspan="2" class="col-head">HWV Term</th><th rowspan="2" class="col-head">Interlock Rough In</th><th rowspan="2" class="col-head">Interlock Term</th><th rowspan="2" class="col-head">Duct Temp Rough In</th><th rowspan="2" class="col-head">Duct Temp Install/Term</th><th rowspan="2" class="col-head">Pneum: Supply Ctrl</th><th rowspan="2" class="col-head">Pneum: Sup-Exhaust</th><th rowspan="2" class="col-head">FSD Rough In</th><th rowspan="2" class="col-head">FSD Term</th><th rowspan="2" style="min-width:160px">REMARK / NOTES</th><th rowspan="2" style="width:60px">% DONE</th></tr><tr><th class="col-head sub-head">Installed </th><th class="col-head sub-head">Termination on controller </th><th class="col-head sub-head">Termination on field device</th></tr></thead><tbody id="tbody-VAV"><tr><td class="srno">1</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">2</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">3</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">4</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">5</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">6</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">7</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">8</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">9</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">10</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">11</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">12</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">13</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">14</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">15</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="ck" onclick="toggleCell(this)" data-section="VAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr></tbody></table></div></div>
+
+
+<div id="sec-EAV" class="section" style="display:none"><div class="sec-header"><div class="sec-title">EAV — Exhaust Air Volume &nbsp;<span id="count-EAV" class="unit-count">0 units</span></div><div class="sec-bar-wrap"><div class="sec-bar" id="bar-EAV" style="width:0%"></div></div><span id="pct-label-EAV" class="pct-label">0%</span><button class="add-btn" onclick="addRow('EAV')">+ Add Unit</button></div><div class="table-wrap"><table id="tbl-EAV"><thead><tr><th style="width:38px">SR.</th><th style="min-width:130px">UNIT / TAG</th><th class="col-head">Unit Installed</th><th class="col-head">120V Power</th><th class="col-head">MAC / Barcode</th><th class="col-head">Comm Wire (CAT-6)</th><th class="col-head">Panel/Ctrl Term</th><th class="col-head">Duct Temp Rough In</th><th class="col-head">Duct Temp Install/Term</th><th class="col-head">Interlock Rough In</th><th class="col-head">Interlock Term</th><th class="col-head">Pneumatic Tube</th><th class="col-head">FSD Rough In</th><th class="col-head">FSD Term</th><th style="min-width:160px">REMARK / NOTES</th><th style="width:60px">% DONE</th></tr></thead><tbody id="tbody-EAV"><tr><td class="srno">1</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">2</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">3</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">4</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">5</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">6</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">7</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">8</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">9</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">10</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="ck" onclick="toggleCell(this)" data-section="EAV"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr></tbody></table></div></div>
+
+
+<div id="sec-FSD" class="section" style="display:none"><div class="sec-header"><div class="sec-title">FSD — Fire / Smoke Damper &nbsp;<span id="count-FSD" class="unit-count">0 units</span></div><div class="sec-bar-wrap"><div class="sec-bar" id="bar-FSD" style="width:0%"></div></div><span id="pct-label-FSD" class="pct-label">0%</span><button class="add-btn" onclick="addRow('FSD')">+ Add Unit</button></div><div class="table-wrap"><table id="tbl-FSD"><thead><tr><th style="width:38px">SR.</th><th style="min-width:130px">UNIT / TAG</th><th class="col-head">Damper Installed</th><th class="col-head">Actuator Installed</th><th class="col-head">Power Rough In</th><th class="col-head">Power Term</th><th class="col-head">Comm Wire Rough In</th><th class="col-head">Comm Wire Term</th><th class="col-head">Panel Term</th><th class="col-head">End Switch</th><th class="col-head">Functional Test</th><th style="min-width:160px">REMARK / NOTES</th><th style="width:60px">% DONE</th></tr></thead><tbody id="tbody-FSD"><tr><td class="srno">1</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">2</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">3</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">4</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">5</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">6</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">7</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">8</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="ck" onclick="toggleCell(this)" data-section="FSD"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr></tbody></table></div></div>
+
+
+<div id="sec-EMETER" class="section" style="display:none"><div class="sec-header"><div class="sec-title">E-Meter — Electric Meter &nbsp;<span id="count-EMETER" class="unit-count">0 units</span></div><div class="sec-bar-wrap"><div class="sec-bar" id="bar-EMETER" style="width:0%"></div></div><span id="pct-label-EMETER" class="pct-label">0%</span><button class="add-btn" onclick="addRow('EMETER')">+ Add Unit</button></div><div class="table-wrap"><table id="tbl-EMETER"><thead><tr><th style="width:38px">SR.</th><th style="min-width:130px">UNIT / TAG</th><th class="col-head">Meter Installed</th><th class="col-head">CT Installation</th><th class="col-head">Power Rough In</th><th class="col-head">Power Term</th><th class="col-head">Comm Wire Rough In</th><th class="col-head">Comm Wire Term</th><th class="col-head">Panel Term</th><th class="col-head">Programming</th><th class="col-head">Verification</th><th style="min-width:160px">REMARK / NOTES</th><th style="width:60px">% DONE</th></tr></thead><tbody id="tbody-EMETER"><tr><td class="srno">1</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">2</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">3</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">4</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">5</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">6</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="ck" onclick="toggleCell(this)" data-section="EMETER"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr></tbody></table></div></div>
+
+
+<div id="sec-AHU" class="section" style="display:none"><div class="sec-header"><div class="sec-title">AHU — Air Handling Unit &nbsp;<span id="count-AHU" class="unit-count">0 units</span></div><div class="sec-bar-wrap"><div class="sec-bar" id="bar-AHU" style="width:0%"></div></div><span id="pct-label-AHU" class="pct-label">0%</span><button class="add-btn" onclick="addRow('AHU')">+ Add Unit</button></div><div class="table-wrap"><table id="tbl-AHU"><thead><tr><th style="width:38px">SR.</th><th style="min-width:130px">UNIT / TAG</th><th class="col-head">Unit Installed</th><th class="col-head">Power Rough In</th><th class="col-head">Power Term</th><th class="col-head">Comm Wire Term</th><th class="col-head">Panel/Ctrl Term</th><th class="col-head">Supply Air Sensor RI</th><th class="col-head">Supply Air Sensor IT</th><th class="col-head">Return Air Sensor RI</th><th class="col-head">Return Air Sensor IT</th><th class="col-head">Mixed Air Sensor</th><th class="col-head">OA Sensor</th><th class="col-head">CHWV Install</th><th class="col-head">CHWV Rough In</th><th class="col-head">CHWV Term</th><th class="col-head">HWV Install</th><th class="col-head">HWV Rough In</th><th class="col-head">HWV Term</th><th class="col-head">OA Damper RI</th><th class="col-head">OA Damper Term</th><th class="col-head">RA Damper RI</th><th class="col-head">RA Damper Term</th><th class="col-head">VFD Supply Fan</th><th class="col-head">VFD Return Fan</th><th class="col-head">Static Press Sensor</th><th class="col-head">Filter DP Switch</th><th style="min-width:160px">REMARK / NOTES</th><th style="width:60px">% DONE</th></tr></thead><tbody id="tbody-AHU"><tr><td class="srno">1</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">2</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">3</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">4</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">5</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">6</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="ck" onclick="toggleCell(this)" data-section="AHU"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr></tbody></table></div></div>
+
+
+<div id="sec-AC" class="section" style="display:none"><div class="sec-header"><div class="sec-title">AC Units — Split / Packaged AC &nbsp;<span id="count-AC" class="unit-count">0 units</span></div><div class="sec-bar-wrap"><div class="sec-bar" id="bar-AC" style="width:0%"></div></div><span id="pct-label-AC" class="pct-label">0%</span><button class="add-btn" onclick="addRow('AC')">+ Add Unit</button></div><div class="table-wrap"><table id="tbl-AC"><thead><tr><th rowspan="2" style="width:38px">SR.</th><th rowspan="2" style="min-width:130px">UNIT / TAG</th><th rowspan="2" class="col-head">Unit Installed</th><th rowspan="2" class="col-head">Power Rough In</th><th rowspan="2" class="col-head">Power Term</th><th rowspan="2" class="col-head">Refrigerant Lines</th><th rowspan="2" class="col-head">Comm Wire Term</th><th rowspan="2" class="col-head">Panel/Ctrl Term</th><th rowspan="2" class="col-head">Tstat Rough In</th><th class="col-head" colspan="3">Tstat Install / Term</th><th rowspan="2" class="col-head">Condensate</th><th rowspan="2" class="col-head">Functional Test</th><th rowspan="2" style="min-width:160px">REMARK / NOTES</th><th rowspan="2" style="width:60px">% DONE</th></tr><tr><th class="col-head sub-head">Install</th><th class="col-head sub-head">Install</th><th class="col-head sub-head">Term</th></tr></thead><tbody id="tbody-AC"><tr><td class="srno">1</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">2</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">3</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">4</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">5</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">6</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">7</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr>
+<tr><td class="srno">8</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="ck" onclick="toggleCell(this)" data-section="AC"></td><td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">—</td></tr></tbody></table></div></div>
+
+</div>
+
+<script>
+const EQUIP_KEYS = ["CRAC", "VAV", "EAV", "FSD", "EMETER", "AHU", "AC"];
+const EQUIP_NCOLS = {
+  "CRAC": 17,
+  "VAV": 22,
+  "EAV": 12,
+  "FSD": 9,
+  "EMETER": 9,
+  "AHU": 25,
+  "AC": 11
+};
+
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const sec = document.getElementById('sec-' + name);
+  if (sec) sec.style.display = 'block';
+  const btn = document.getElementById('nav-' + name);
+  if (btn) btn.classList.add('active');
+  if (name === 'SUMMARY') document.querySelector('.nav-btn').classList.add('active');
+}
+
+function toggleCell(td) {
+  const cur = td.dataset.val || '';
+  const next = cur === '' ? 'done' : cur === 'done' ? 'issue' : '';
+  td.dataset.val = next;
+  td.textContent = next === 'done' ? '\u2713' : next === 'issue' ? '\u2717' : '';
+  updateProgress(td.dataset.section);
+}
+
+function updateProgress(key) {
+  const tbody = document.getElementById('tbody-' + key);
+  if (!tbody) return;
+  const rows = tbody.querySelectorAll('tr');
+  let totalChecks = 0,
+    doneChecks = 0,
+    unitCount = 0;
+  rows.forEach(row => {
+    const checks = row.querySelectorAll('.ck');
+    if (!checks.length) return;
+    unitCount++;
+    let rowDone = 0;
+    checks.forEach(ck => {
+      totalChecks++;
+      if (ck.dataset.val === 'done') {
+        doneChecks++;
+        rowDone++;
+      }
+    });
+    const pctCell = row.querySelector('.pct-cell');
+    if (pctCell) pctCell.textContent = Math.round(rowDone / checks.length * 100) + '%';
+  });
+  const pct = totalChecks > 0 ? Math.round(doneChecks / totalChecks * 100) : 0;
+  const color = pct >= 90 ? '#27ae60' : pct >= 70 ? '#f39c12' : pct >= 40 ? '#e67e22' : '#4a9eff';
+  const bar = document.getElementById('bar-' + key);
+  const lbl = document.getElementById('pct-label-' + key);
+  const cnt = document.getElementById('count-' + key);
+  if (bar) {
+    bar.style.width = pct + '%';
+    bar.style.background = color;
+  }
+  if (lbl) lbl.textContent = pct + '%';
+  if (cnt) cnt.textContent = unitCount + ' units';
+  const cpct = document.getElementById('cpct-' + key);
+  const csub = document.getElementById('csub-' + key);
+  const cbar = document.getElementById('cbar-' + key);
+  const card = document.getElementById('card-' + key);
+  if (cpct) {
+    cpct.textContent = pct + '%';
+    cpct.style.color = pct >= 90 ? '#27ae60' : pct >= 70 ? '#f39c12' : '#1a2744';
+  }
+  if (csub) csub.textContent = doneChecks + ' / ' + totalChecks + ' checks';
+  if (cbar) {
+    cbar.style.width = pct + '%';
+    cbar.style.background = color;
+  }
+  if (card) card.style.borderTopColor = color;
+  updateOverall();
+}
+
+function updateOverall() {
+  let tot = 0,
+    done = 0;
+  EQUIP_KEYS.forEach(k => {
+    document.querySelectorAll('#tbl-' + k + ' .ck').forEach(ck => {
+      tot++;
+      if (ck.dataset.val === 'done') done++;
+    });
+  });
+  const pct = tot > 0 ? Math.round(done / tot * 100) : 0;
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('overall-sub').textContent = done + ' of ' + tot + ' checkpoints complete';
+  const ob = document.getElementById('overall-bar');
+  if (ob) {
+    ob.style.width = pct + '%';
+    ob.style.background = pct >= 90 ? '#27ae60' : pct >= 70 ? '#f39c12' : '#27ae60';
+  }
+}
+
+function addRow(key) {
+  const tbody = document.getElementById('tbody-' + key);
+  const rowNum = tbody.querySelectorAll('tr').length + 1;
+  const ncols = EQUIP_NCOLS[key];
+  const tr = document.createElement('tr');
+  const tds = Array.from({
+    length: ncols
+  }, () => '<td class="ck" onclick="toggleCell(this)" data-section="' + key + '"></td>').join('');
+  tr.innerHTML = '<td class="srno">' + rowNum + '</td><td class="unit-input" contenteditable="true" placeholder="TAG-XX-XX"></td>' + tds + '<td class="remark-cell" contenteditable="true" placeholder="Notes..."></td><td class="pct-cell">0%</td>';
+  tbody.appendChild(tr);
+}
+</script>
+</body>
+</html>
